@@ -10,10 +10,12 @@ services:
       - key: PEPPER
         value: qwerty321
       - key: DB_HOST
-        value: sql112.infinityfree.com
+        value: localhost
       - key: DB_USER
-        value: if0_37529564
+        value: postgres
       - key: DB_PASSWORD
-        value: Auth4Hash  # Replace with your MySQL password
+        value: gwapokoQ123 
       - key: DB_NAME
-        value: if0_37529564_user_account
+        value: user_account
+      - key: DB_PORT
+        value: 5959
