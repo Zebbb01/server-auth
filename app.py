@@ -45,29 +45,30 @@ def is_strong_password(password):
         return True
     return False
 
+# Signup route
 @app.route('/signup', methods=['POST'])
 def signup():
-    conn = create_connection()
-    if not conn:
-        return jsonify({"error": "Database connection failed"}), 500
-
-    cursor = conn.cursor()
-
     try:
-        name = request.json['name']
+        conn = create_connection()
+        cursor = conn.cursor()
+
+        name = request.json['name']  # Capture the name
         email = request.json['email']
         password = request.json['password']
 
+        # Check if the email already exists
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-        if cursor.fetchone():
+        user = cursor.fetchone()
+        if user:
             return jsonify({"error": "Email already exists"}), 409
 
+        # Validate the password strength
         if not is_strong_password(password):
             return jsonify({"error": "Password must be at least 8 characters long and include upper, lower, digit, and special character"}), 400
 
+        # Hashing password with pepper
         hashed_password = bcrypt.hashpw((password + PEPPER).encode('utf-8'), bcrypt.gensalt())
-        cursor.execute("INSERT INTO users (name, email, password, pepper) VALUES (%s, %s, %s, %s)",
-                       (name, email, hashed_password, PEPPER))
+        cursor.execute("INSERT INTO users (name, email, password, pepper) VALUES (%s, %s, %s, %s)", (name, email, hashed_password, PEPPER))
         conn.commit()
 
         return jsonify({"message": "User created successfully"}), 201
@@ -76,18 +77,17 @@ def signup():
         return jsonify({"error": str(e)}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
 
+# Login route
 @app.route('/login', methods=['POST'])
 def login():
-    conn = create_connection()
-    if not conn:
-        return jsonify({"error": "Database connection failed"}), 500
-
-    cursor = conn.cursor()
-
     try:
+        conn = create_connection()
+        cursor = conn.cursor()
+
         email = request.json['email']
         password = request.json['password']
 
@@ -95,15 +95,19 @@ def login():
         user = cursor.fetchone()
 
         if user:
-            stored_password = user[3]
-            pepper = user[4]
+            stored_password = user[3]  # assuming the password is in the 3rd column
+            pepper = user[4]  # assuming the pepper is in the 4th column
 
+            # Check password with pepper
             if bcrypt.checkpw((password + pepper).encode('utf-8'), stored_password.encode('utf-8')):
                 return jsonify({
                     "message": "Login successful",
                     "user": {
-                        "name": user[1],
-                        "email": user[2],
+                        "name": user[1],  # assuming name is in the 1st column
+                        "email": user[2],  # assuming email is in the 2nd column
+                        "password": password,  # show password
+                        "hashed_password": stored_password,  # Send hashed password
+                        "pepper": pepper  # Send pepper
                     }
                 }), 200
             else:
@@ -115,9 +119,10 @@ def login():
         return jsonify({"error": str(e)}), 500
 
     finally:
-        cursor.close()
-        conn.close()
-
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            
 @app.route('/<path:path>')
 def serve_static_files(path):
     return send_from_directory(app.static_folder, path)
