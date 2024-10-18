@@ -47,15 +47,14 @@ def is_strong_password(password):
     return False
 
 # To create a user
-def create_user(email, password, pepper):
+def create_user(password, pepper):
     # Combine password and pepper
     password_with_pepper = password + pepper
-    # Hash the password
+    # Hash the password and salt
     hashed_password = bcrypt.hashpw(password_with_pepper.encode('utf-8'), bcrypt.gensalt())
     return hashed_password  # return the hashed password for further processing
 
 def migrate_user_table():
-    print("yawaaaaa doggg")
     conn = create_connection()
     if conn is None:
         return
