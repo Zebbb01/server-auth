@@ -48,8 +48,10 @@ def is_strong_password(password):
 # Signup route
 @app.route('/signup', methods=['POST'])
 def signup():
+    conn = create_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
     try:
-        conn = create_connection()
         cursor = conn.cursor()
 
         name = request.json['name']  # Capture the name
@@ -84,8 +86,10 @@ def signup():
 # Login route
 @app.route('/login', methods=['POST'])
 def login():
+    conn = create_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
     try:
-        conn = create_connection()
         cursor = conn.cursor()
 
         email = request.json['email']
