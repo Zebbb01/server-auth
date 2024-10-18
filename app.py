@@ -55,6 +55,7 @@ def create_user(email, password, pepper):
     return hashed_password  # return the hashed password for further processing
 
 def migrate_user_table():
+    print("yawaaaaa doggg")
     conn = create_connection()
     if conn is None:
         return
@@ -79,6 +80,9 @@ def migrate_user_table():
     finally:
         cursor.close()
         conn.close()
+        
+migrate_user_table()
+        
 
 # Signup route
 @app.route('/signup', methods=['POST'])
@@ -177,5 +181,4 @@ def serve_static_files(path):
 
 
 if __name__ == '__main__':
-    migrate_user_table()
     app.run(debug=True)
