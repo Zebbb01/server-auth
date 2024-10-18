@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: flask-backend
+    env: python
+    plan: free
+    runtime: python3
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:10000
+    envVars:
+      - key: PEPPER
+        value: qwerty321
+      - key: DB_HOST
+        value: sql112.infinityfree.com
+      - key: DB_USER
+        value: if0_37529564
+      - key: DB_PASSWORD
+        value: Auth4Hash  # Replace with your MySQL password
+      - key: DB_NAME
+        value: if0_37529564_user_account
