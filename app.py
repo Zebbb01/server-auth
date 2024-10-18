@@ -42,7 +42,7 @@ def is_strong_password(password):
             re.search(r"[A-Z]", password) and
             re.search(r"[a-z]", password) and
             re.search(r"\d", password) and
-            re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)):  # Include special characters
+            re.search(r"[!@#$%^&*_()-,.?\":{}|<>]", password)):  # Include special characters
         return True
     return False
 
